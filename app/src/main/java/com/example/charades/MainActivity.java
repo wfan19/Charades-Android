@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
                     words.add(word);
                 }
         }catch(IOException e){e.printStackTrace();}
-        Log.d(TAG, "Shuffling");
+        Log.d(TAG, "Shufflin");
         Collections.shuffle(words);
         for(Word word : words)
             Log.d(TAG, "Word: " + word);

@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Charades</string>
+
+    <string name="next">NEXT</string>
+
+    <string name="select_words">Select</string>
+    <string name="import_words">Import</string>
+    <string name="clear_words">Clear</string>
 </resources>

@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+
+    <TextView
+
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="15dp"
+        android:layout_marginEnd="141dp"
+        android:layout_marginBottom="15dp"
+        android:gravity="center_horizontal"
+        android:letterSpacing="0.01"
+        android:text="Enter Name"
+        android:textColor="#de000000"
+        android:textSize="18sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@drawable/ic_input"
+        android:orientation="vertical">
+
+        <TextView
+
+            android:id="@+id/tv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginTop="3dp"
+            android:fontFamily="sans-serif"
+            android:letterSpacing="0.03"
+            android:lineSpacingExtra="4sp"
+            android:text="Name"
+            android:textColor="#1B1B1B"
+            android:textSize="12sp" />
+
+        <EditText
+            android:id="@+id/wordbank_name_et"
+            android:layout_width="237dp"
+            android:layout_height="24dp"
+            android:layout_marginLeft="23dp"
+            android:layout_marginTop="3dp"
+            android:background="@null"
+            android:hint="Input name" />
+    </LinearLayout>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_weight="0" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="right"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/tv_cancel"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:background="?attr/selectableItemBackground"
+            android:padding="5dp"
+            android:text="@android:string/cancel"
+            android:textAlignment="viewEnd"
+            android:textSize="18sp" />
+
+        <Space
+            android:layout_width="30dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="0" />
+
+        <TextView
+            android:id="@+id/tv_confirm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
+            android:layout_weight="0"
+            android:background="?attr/selectableItemBackground"
+            android:padding="5dp"
+            android:text="Confirm"
+            android:textAlignment="viewEnd"
+            android:textSize="18sp" />
+
+    </LinearLayout>
+
+    <Space
+        android:layout_width="wrap_content"
+        android:layout_height="10dp"
+        android:layout_weight="0" />
+
+
+</LinearLayout>
+
+

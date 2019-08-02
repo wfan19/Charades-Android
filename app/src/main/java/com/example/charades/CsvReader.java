@@ -27,7 +27,7 @@ public class CsvReader {
     public CsvReader(Context ctx, String p)
     {
         this.context = ctx;
-        path = p;
+        path = "csv/" + p;
     }
 
     public CsvReader(Context ctx, Uri u)

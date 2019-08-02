@@ -7,8 +7,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.Color;
@@ -25,7 +28,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -51,17 +56,26 @@ public class MainActivity extends AppCompatActivity {
 
         initWordBanks();
 
-        if(tagList.size() ==0)
+        Log.d(TAG, "Current is " + dbh.getCurrent());
+
+        if(tagList.size() ==0) {
+            Log.d(TAG, "No tags found, importing from assets");
             ImportFromAsset();
+        }
         else
         {
-            importFromDB("n1");
+            Log.d(TAG, "Possible tags: " + tagList.toString());
+            if(dbh.getCurrent() == null)
+                dbh.createCurrent(tagList.get(0));
+            importFromDB(dbh.getCurrent());
         }
 
 
         tv_word = findViewById(R.id.tv_word);
         btn_next = findViewById(R.id.btn_next);
         tv_word.setText("" + allWords.get(0));
+
+        registerReceiver(mBroadcastReceiver, new IntentFilter("com.example.charades.UPDATE"));
     }
 
     @Override
@@ -114,12 +128,16 @@ public class MainActivity extends AppCompatActivity {
                 Log.d(TAG, "New word: " + word);
                 bank.add(word);
                 allWords.add(word);
+                dbh.insertData(row[0],row[1],"default");
             }
         }catch(IOException e){e.printStackTrace();}
         Log.d(TAG, "Shuffling words");
         Collections.shuffle(allWords);
         for(Word word : allWords)
             Log.d(TAG, "Word: " + word);
+
+        dbh.createCurrent("default");
+        Log.d(TAG, "Current is now " + dbh.getCurrent());
     }
 
     private void reset()
@@ -210,7 +228,17 @@ public class MainActivity extends AppCompatActivity {
                             Log.d(TAG, "Finished words: " + finished);
                             Log.d(TAG, "Words remaining: " + remaining);
                             wordBanks.add(new WordBank(MainActivity.this, allWords, name));
+
+                            dbh.setCurrent(name);
+                            Log.d(TAG, "Current is now " + dbh.getCurrent());
                             dialog.dismiss();
+
+                            runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(MainActivity.this, "Words added!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
                     });
 
@@ -246,7 +274,7 @@ public class MainActivity extends AppCompatActivity {
                         dialog.setContentView(R.layout.select_menu);
 
                         final RecyclerView recyclerView = dialog.findViewById(R.id.word_banks);
-                        adapter = new WordBankAdapter(wordBanks,MainActivity.this);
+                        adapter = new WordBankAdapter(wordBanks,MainActivity.this,dbh);
                         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(MainActivity.this);
                         recyclerView.setLayoutManager(layoutManager);
                         recyclerView.setAdapter(adapter);
@@ -285,22 +313,23 @@ public class MainActivity extends AppCompatActivity {
         {
             do{
                 String tag = tags.getString(tags.getColumnIndex("tag"));
-                Cursor bank = dbh.search(new String[]{"word1","word2"},"tag",tag);
-                Log.d(TAG, "Current word bank: " + tag);
-                tagList.add(tag);
-                ArrayList<Word> importedWords = new ArrayList<>();
-                if(bank.moveToFirst())
-                {
-                    do{
-                        String word1 = bank.getString(bank.getColumnIndex("word1"));
-                        String word2 = bank.getString(bank.getColumnIndex("word2"));
-                        Word w = new Word(word1, word2);
-                        Log.d(TAG, "Current word: "  + w);
-                        importedWords.add(w);
-                    }while(bank.moveToNext());//Loop through words for each tag
+                if(tag!=null) {
+                    Cursor bank = dbh.search(new String[]{"word1", "word2"}, "tag", tag);
+                    Log.d(TAG, "Current word bank: " + tag);
+                    tagList.add(tag);
+                    ArrayList<Word> importedWords = new ArrayList<>();
+                    if (bank.moveToFirst()) {
+                        do {
+                            String word1 = bank.getString(bank.getColumnIndex("word1"));
+                            String word2 = bank.getString(bank.getColumnIndex("word2"));
+                            Word w = new Word(word1, word2);
+                            Log.d(TAG, "Current word: " + w);
+                            importedWords.add(w);
+                        } while (bank.moveToNext());//Loop through words for each tag
+                    }
+                    wordBanks.add(new WordBank(this, importedWords, tag));
+                    bank.close();
                 }
-                wordBanks.add(new WordBank(this,importedWords,tag));
-                bank.close();
             }while (tags.moveToNext());//Loop through tags
         }
 
@@ -315,8 +344,7 @@ public class MainActivity extends AppCompatActivity {
 
         for(WordBank wb : wordBanks) {
             Log.d(TAG, "Found wb " + wb.getTag());
-            if (wb.getTag().equals(tag)) {
-                Log.d(TAG, "------------------- This is it -------------------");
+            if (null != wb.getTag() && wb.getTag().equals(tag)) {
                 ArrayList<Word> gotWords = wb.getWords();
                 for (Word w : gotWords) {
                     Log.d(TAG, "Adding word " + w);
@@ -327,11 +355,21 @@ public class MainActivity extends AppCompatActivity {
                 Collections.shuffle(allWords);
                 for (Word word : allWords)
                     Log.d(TAG, "Word: " + word);
-                Log.d(TAG, "------------------- Finished importing -------------------");
             }
         }
     }
 
-
+    private final BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            final String action = intent.getAction();
+            if(action.equals("com.example.charades.UPDATE"))
+            {
+                Log.d(TAG, "Switching wb to " + dbh.getCurrent());
+                importFromDB(dbh.getCurrent());
+                tv_word.setText("" + allWords.get(0));
+            }
+        }
+    };
 
 }

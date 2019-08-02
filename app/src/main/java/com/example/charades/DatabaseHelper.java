@@ -13,7 +13,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String DB_NAME = "WordBank.db";
     public static final String TABLE_NAME = "WordBank";
     private static final String create_table_sql = "create table " + TABLE_NAME
-            + " (word1 varchar(20) not null, word2 varchar(20) not null, tag varchar(20) not null);";
+            + " (word1 varchar(20) not null, word2 varchar(20), tag varchar(20));";
 
     //TODO: Add column for boolean (INT?) 'DEFAULT' for saving default word bank
 
@@ -130,6 +130,40 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     {
         SQLiteDatabase db = getWritableDatabase();
         db.delete(TABLE_NAME,null,null);
+        db.close();
+    }
+
+    public void setCurrent(String tag)
+    {
+        Log.d(TAG, "Setting current to " + tag);
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("word2",tag);
+        String where = "word1 = ?";
+        String[] whereArgs = {"current"};
+        db.update(TABLE_NAME,cv,where, whereArgs);
+        db.close();
+    }
+
+    public void createCurrent(String tag)
+    {
+        Log.d(TAG, "Creating current");
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues cv = new ContentValues();
+        cv.put("word2",tag);
+        cv.put("word1","current");
+        db.insert(TABLE_NAME,null,cv);
+        db.close();
+    }
+
+    public String getCurrent()
+    {
+        Log.d(TAG, "Getting current");
+        SQLiteDatabase db = getWritableDatabase();
+        Cursor query = db.rawQuery("SELECT word2 FROM " + TABLE_NAME + " WHERE word1 = \"current\"",null);
+        if(query.moveToFirst())
+            return query.getString(query.getColumnIndex("word2"));
+        return null;
     }
 
 }

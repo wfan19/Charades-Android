@@ -17,7 +17,7 @@
         android:letterSpacing="0.01"
         android:text="Enter Name"
         android:textColor="#de000000"
-        android:textSize="20sp" />
+        android:textSize="18sp" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -57,7 +57,6 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="5dp"
         android:gravity="right"
         android:orientation="horizontal">
 
@@ -81,6 +80,7 @@
             android:id="@+id/tv_confirm"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginRight="5dp"
             android:layout_weight="0"
             android:background="?attr/selectableItemBackground"
             android:padding="5dp"

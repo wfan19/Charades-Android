@@ -21,6 +21,7 @@
         android:layout_weight="1"
         android:background="#00FFFFFF"
         android:text="bank_name"
+        android:textAlignment="center"
         android:textSize="36sp" />
 
     <CheckBox
